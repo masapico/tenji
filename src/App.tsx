@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Container, Row, Stack } from "react-bootstrap";
 import ModeTenji from "./components/ModeTenji";
 import ModeKana from "./components/ModeKana";
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowRight, FaGithub } from "react-icons/fa";
 import { GoArrowBoth } from "react-icons/go";
 
 const App: React.FC = () => {
@@ -45,6 +45,11 @@ const App: React.FC = () => {
               <FaArrowRight />
               点字
             </span>
+          </div>
+          <div>
+            <a href="https://github.com/masapico/tenji" target="_blank" rel="noreferrer">
+              <FaGithub className="text-secondary" style={{fontSize: "1.1rem"}}/>
+            </a>
           </div>
         </Stack>
       </Row>
