@@ -1,0 +1,9 @@
+.clickable {
+  cursor: pointer;
+}
+
+@media print {
+  .no-print {
+    display: none;
+  }
+}
