@@ -12,14 +12,15 @@ const App: React.FC = () => {
     <Container>
       <Row className="my-3 no-print">
         <Stack direction="horizontal" gap={3}>
-          <h1 className="h6">点字 - Tenji</h1>
+          <h1 className="h5">点字 - Tenji</h1>
           <div className="ms-auto">
             <span
               className={
                 mode === "tenji"
-                  ? "h6 text-success"
+                  ? "h6"
                   : "text-primary text-decoration-underline clickable"
               }
+              style={mode !== "tenji" ? {fontSize: ".9rem"} :{fontSize: "1.1rem"}}
               onClick={() => setMode("tenji")}
             >
               点字
@@ -34,9 +35,10 @@ const App: React.FC = () => {
             <span
               className={
                 mode === "kana"
-                  ? "h6 text-success"
+                  ? "h6"
                   : "text-primary text-decoration-underline clickable"
               }
+              style={mode !== "kana" ? {fontSize: ".9rem"} :{fontSize: "1.1rem"}}
               onClick={() => setMode("kana")}
             >
               ひらがな
