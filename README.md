@@ -1,54 +1,69 @@
-# React + TypeScript + Vite
+# Tenji (点字) - 日本の点字学習・変換アプリケーション
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Tenji** は、日本の点字（点字）を学び、使い、理解するためのウェブアプリケーションです。点字学習の初心者から、点字翻訳や作成の補助ツールを求める上級者まで、幅広いユーザーにとって使いやすい環境を提供します。
 
-Currently, two official plugins are available:
+## 特徴
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+*   **インタラクティブな点字学習:**
+    *   インタラクティブなレッスンを通じて、日本の点字の基礎を学ぶことができます。
+    *   実践的な練習問題を通して、点字の読み書きを効果的に習得できます。
+    * 点字の点字マスの形状と各点の位置を視覚的に確認できます。
+*   **テキストから点字への変換:**
+    *   日本語テキスト（ひらがな、カタカナ、漢字）を、簡単に点字に変換できます。
+    *   変換された点字はコピーして、他のアプリケーションで利用することができます。
+*   **点字からテキストへの変換:**
+    *   点字（点字の点のパターン、またはUnicode点字文字）を入力して、日本語テキストに変換できます。
+*   **カスタマイズ可能な設定:**
+    *   点字文字の表示サイズを調整して、より読みやすくすることができます。
+    *   表示モードを切り替えることができます。（例：標準的な点、番号付きの点）
+*   **包括的な点字表:**
+    *   促音、拗音、数字、句読点、一般的な記号など、日本語点字のすべての文字と記号を一覧で確認できる点字表にアクセスできます。
+* **アクセシビリティ:**
+    * スクリーンリーダーとキーボード操作に対応しています。W3Cのアクセシビリティガイドラインに準拠する予定です。
 
-## Expanding the ESLint configuration
+## 使い方
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1.  **学習モード:** 「学習」セクションに移動して、点字の学習を開始します。レッスンを進め、練習問題を解くことで、知識を定着させることができます。
+2.  **テキストから点字:** 日本語テキストを入力欄に入力し、「変換」ボタンをクリックします。対応する点字が表示されます。
+3.  **点字からテキスト:** 点字文字または点のパターンを入力すると、アプリケーションが日本語に翻訳します。
+4.  **点字表:** 「点字表」セクションで、点字記号とその意味の包括的なリストを参照できます。
+5. **設定:** アプリ内で点字の表示を変更することができます。
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## 開発者向け情報
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 動作環境
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+*   Node.js (LTS推奨)
+*   npm または Yarn
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+### 開発サーバーの起動
+
+1.  **リポジトリのクローン:**
+    ```bash
+    git clone [リポジトリURL]
+    ```
+2.  **依存関係のインストール:**
+    ```bash
+    npm install
+    ```
+    または
+    ```bash
+    yarn install
+    ```
+3.  **開発サーバーの起動:**
+    ```bash
+    npm run dev
+    ```
+    または
+    ```bash
+    yarn dev
+    ```
+    これにより、ローカル開発サーバーが起動し、アプリケーションを操作できます。
+
+### ビルド
+
+本番環境用にビルドする場合は、以下のコマンドを実行します。
+
+```bash
+npm run build
+
