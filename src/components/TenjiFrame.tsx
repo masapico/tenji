@@ -57,13 +57,13 @@ const TenjiFrame: React.FC<TenjiFrameProps> = ({
   return (
     <Container
       className="mb-3"
-      style={{ width: "50px", height: "75px", border: "1px solid #ccc" }}
+      style={{ maxWidth: "50px", height: "75px", border: "1px solid #ccc" }}
       title={identifyTenji(currentValue)}
     >
       <Row className="text-center">
         <Col
-          sm={6}
-          className="p-0 m-0 clickable"
+          xs={6}
+          className="p-0 mx-0 clickable"
           onClick={() => {
             if (editable) setCell1((prevState) => !prevState);
           }}
@@ -71,7 +71,7 @@ const TenjiFrame: React.FC<TenjiFrameProps> = ({
           <span className="text-secondary">{cell1 ? "●" : "○"}</span>
         </Col>
         <Col
-          sm={6}
+          xs={6}
           className="p-0 m-0 clickable"
           onClick={() => {
             if (editable) setCell4((prevState) => !prevState);
@@ -82,7 +82,7 @@ const TenjiFrame: React.FC<TenjiFrameProps> = ({
       </Row>
       <Row className="text-center">
         <Col
-          sm={6}
+          xs={6}
           className="p-0 m-0 clickable"
           onClick={() => {
             if (editable) setCell2((prevState) => !prevState);
@@ -91,7 +91,7 @@ const TenjiFrame: React.FC<TenjiFrameProps> = ({
           <span className="text-secondary">{cell2 ? "●" : "○"}</span>
         </Col>
         <Col
-          sm={6}
+          xs={6}
           className="p-0 m-0 clickable"
           onClick={() => {
             if (editable) setCell5((prevState) => !prevState);
@@ -102,7 +102,7 @@ const TenjiFrame: React.FC<TenjiFrameProps> = ({
       </Row>
       <Row className="text-center">
         <Col
-          sm={6}
+          xs={6}
           className="p-0 m-0 clickable"
           onClick={() => {
             if (editable) setCell3((prevState) => !prevState);
@@ -111,7 +111,7 @@ const TenjiFrame: React.FC<TenjiFrameProps> = ({
           <span className="text-secondary">{cell3 ? "●" : "○"}</span>
         </Col>
         <Col
-          sm={6}
+          xs={6}
           className="p-0 m-0 clickable"
           onClick={() => {
             if (editable) setCell6((prevState) => !prevState);
@@ -121,7 +121,7 @@ const TenjiFrame: React.FC<TenjiFrameProps> = ({
         </Col>
       </Row>
       <Row className="mb-2">
-        <Col sm={12} className="p-2 m-0 text-center h6">
+        <Col xs={12} className="p-2 m-0 text-center h6">
           {kana}
         </Col>
       </Row>
