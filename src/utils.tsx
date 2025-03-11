@@ -23,9 +23,6 @@ export const identifyTenjiArray = (values: string[]) => {
           // 組合せパターンの値 12桁
           const cmbValue = `${cmb[0]}${value}`;
           cmb.pop(); // 組合せ判定後に削除
-
-          console.log(TenjiCombinationMap[cmbValue]);
-
           if (TenjiCombinationMap[cmbValue]) {
             chars.push(`${TenjiCombinationMap[cmbValue]}`);
           }
@@ -34,7 +31,7 @@ export const identifyTenjiArray = (values: string[]) => {
         }
       }
     } else {
-      // TenjiMapに存在しない場合は全角アンダーバー
+      // TenjiMapに存在しない場合
       chars.push("　");
     }
   });
@@ -42,15 +39,17 @@ export const identifyTenjiArray = (values: string[]) => {
 };
 
 export const getTenjiValues = (words: string) => {
-  let tmp = words.replace("^", "_");
-  // 先に組合せパターンを変換
+  // 処理に影響ある半角スペースの削除
+  const regexSpace = /\s/g;
+  let tmp = words.replace(regexSpace, "");
+
   const cmbKeys = Object.keys(TenjiCombinationMap);
   cmbKeys.map((key) => {
     if (tmp.includes(TenjiCombinationMap[key])) {
-      const replaceValue = `${key.substring(0, 6)}^${key.substring(
+      const replaceValue = `${key.substring(0, 6)}${" "}${key.substring(
         6,
         key.length
-      )}^`;
+      )}${" "}`;
       const regex = new RegExp(TenjiCombinationMap[key], "g");
       tmp = tmp.replace(regex, replaceValue);
     }
@@ -59,11 +58,14 @@ export const getTenjiValues = (words: string) => {
   keys.map((key) => {
     if (tmp.includes(TenjiMap[key])) {
       const regex = new RegExp(TenjiMap[key], "g");
-      tmp = tmp.replace(regex, `${key}^`);
+      tmp = tmp.replace(regex, `${key}${" "}`);
     }
   });
+  // 半角数字と半角スペース以外を置換
+  const regexNotNumber = /[^0-9 ]/g;
+  tmp = tmp.replace(regexNotNumber, "000000 ");
   // 最後の^は削除して分割
-  return tmp.substring(0, tmp.length - 1).split("^");
+  return tmp.substring(0, tmp.length - 1).split(" ");
 };
 
 const TenjiMap: Record<string, string> = {

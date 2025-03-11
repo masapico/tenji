@@ -11,8 +11,6 @@ const ModeKana: React.FC = () => {
 
   const handleTranslate = () => {
     const words = refInput.current ? refInput.current.value : "";
-    // TODO: 半角・全角スペースをすべて削除する
-    const validWords = words.replace
     if (words.length > 0) {
       setTenjiValues([...getTenjiValues(words)]);
       setKanaValues(identifyTenjiArray(getTenjiValues(words)));
