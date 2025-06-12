@@ -12,7 +12,11 @@ const App: React.FC = () => {
     <Container>
       <Row className="my-3 no-print">
         <Stack direction="horizontal" gap={3}>
-          <h1 className="h5">点字 - Tenji</h1>
+          <h1 className="h5">
+            <a href="./" target="_blank" style={{ textDecoration: "none" }}>
+              点字 - Tenji
+            </a>
+          </h1>
           <div className="ms-auto">
             <span
               className={
@@ -20,7 +24,11 @@ const App: React.FC = () => {
                   ? "h6"
                   : "text-primary text-decoration-underline clickable"
               }
-              style={mode !== "tenji" ? {fontSize: ".9rem"} :{fontSize: "1.1rem"}}
+              style={
+                mode !== "tenji"
+                  ? { fontSize: ".9rem" }
+                  : { fontSize: "1.1rem" }
+              }
               onClick={() => setMode("tenji")}
             >
               点字
@@ -38,7 +46,9 @@ const App: React.FC = () => {
                   ? "h6"
                   : "text-primary text-decoration-underline clickable"
               }
-              style={mode !== "kana" ? {fontSize: ".9rem"} :{fontSize: "1.1rem"}}
+              style={
+                mode !== "kana" ? { fontSize: ".9rem" } : { fontSize: "1.1rem" }
+              }
               onClick={() => setMode("kana")}
             >
               ひらがな
@@ -47,8 +57,15 @@ const App: React.FC = () => {
             </span>
           </div>
           <div>
-            <a href="https://github.com/masapico/tenji" target="_blank" rel="noreferrer">
-              <FaGithub className="text-secondary" style={{fontSize: "1.1rem"}}/>
+            <a
+              href="https://github.com/masapico/tenji"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <FaGithub
+                className="text-secondary"
+                style={{ fontSize: "1.1rem" }}
+              />
             </a>
           </div>
         </Stack>

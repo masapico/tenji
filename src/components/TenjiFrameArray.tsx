@@ -36,7 +36,6 @@ const TenjiFrameArray: React.FC = () => {
           />
         ))}
         <div
-          className="no-print"
           style={{
             display: "flex",
             flexDirection: "column",
