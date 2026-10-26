@@ -1,0 +1,255 @@
+/**
+ * @file tenji.css
+ * @description 点字マス、ドットボタン、行レイアウト、および印刷用スタイル
+ */
+
+/* --- 点字行コンテナ --- */
+.tenji-rows-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dads-space-6);
+  margin-bottom: var(--dads-space-6);
+}
+
+.tenji-row {
+  background-color: #ffffff;
+  border: 1px solid var(--dads-color-border-subtle);
+  border-radius: var(--dads-radius-md);
+  padding: var(--dads-space-4);
+  box-shadow: var(--dads-shadow-sm);
+}
+
+.tenji-row__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--dads-space-3);
+  padding-bottom: var(--dads-space-2);
+  border-bottom: 1px dashed var(--dads-color-border-subtle);
+}
+
+.tenji-row__title {
+  font-size: var(--dads-font-size-sm);
+  font-weight: 700;
+  color: var(--dads-color-text-secondary);
+}
+
+.tenji-row__body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dads-space-2);
+  overflow-x: auto;
+  padding-bottom: var(--dads-space-2);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* --- 点字マス (Tenji Cell) --- */
+.tenji-cell {
+  flex: 0 0 auto;
+  width: 58px;
+  background-color: #ffffff;
+  border: 1px solid var(--dads-color-border-normal);
+  border-radius: var(--dads-radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 4px 4px;
+  user-select: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tenji-cell:hover {
+  border-color: var(--dads-color-blue-600);
+}
+
+/* 6点ドットグリッド */
+.tenji-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 22px);
+  grid-template-rows: repeat(3, 22px);
+  gap: 3px 4px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 個別ドットボタン */
+.tenji-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--dads-color-border-normal);
+  background-color: #ffffff;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+/* ドットがOFFのときの視認用ガイド（中心の薄い点） */
+.tenji-dot::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--dads-color-border-subtle);
+  transition: opacity 0.15s ease;
+}
+
+.tenji-dot:hover {
+  border-color: var(--dads-color-blue-600);
+}
+
+/* ドットがON（凸面・突起）の状態 */
+.tenji-dot[aria-pressed="true"] {
+  background-color: var(--dads-color-blue-600);
+  border-color: var(--dads-color-blue-700);
+  box-shadow: 0 1px 3px rgba(0, 43, 102, 0.4);
+}
+
+.tenji-dot[aria-pressed="true"]::after {
+  opacity: 0;
+}
+
+/* 編集不可（読み取り専用・ひらがなモード出力など） */
+.tenji-cell--readonly .tenji-dot {
+  cursor: default;
+  pointer-events: none;
+}
+
+.tenji-cell--readonly:hover {
+  border-color: var(--dads-color-border-normal);
+}
+
+/* マス下部の文字表示 */
+.tenji-cell__char {
+  margin-top: 4px;
+  height: 24px;
+  line-height: 24px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--dads-color-text-primary);
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- 行内のマス操作コントローラー（追加・削除） --- */
+.tenji-row-controls {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dads-space-1);
+  margin-left: var(--dads-space-1);
+  align-self: center;
+}
+
+.tenji-ctrl-button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: var(--dads-radius-sm);
+  border: 1px solid var(--dads-color-border-subtle);
+  background-color: var(--dads-color-bg-secondary);
+  color: var(--dads-color-text-primary);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.tenji-ctrl-button:hover {
+  background-color: var(--dads-color-blue-50);
+  border-color: var(--dads-color-blue-600);
+  color: var(--dads-color-blue-600);
+}
+
+.tenji-ctrl-button--remove {
+  color: var(--dads-color-danger);
+}
+
+.tenji-ctrl-button--remove:hover {
+  background-color: var(--dads-color-danger-bg);
+  border-color: var(--dads-color-danger);
+  color: var(--dads-color-danger-hover);
+}
+
+/* --- ひらがなモードの点字マス一覧グリッド --- */
+.tenji-kana-output {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dads-space-2);
+  min-height: 90px;
+  padding: var(--dads-space-4);
+  background-color: var(--dads-color-bg-secondary);
+  border: 1px solid var(--dads-color-border-subtle);
+  border-radius: var(--dads-radius-md);
+}
+
+.tenji-kana-empty-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  color: var(--dads-color-text-secondary);
+  font-size: var(--dads-font-size-sm);
+  font-style: italic;
+  padding: var(--dads-space-4) 0;
+}
+
+/* --- 印刷用スタイル (Print) --- */
+@media print {
+  .no-print,
+  .dads-header,
+  .dads-footer,
+  .dads-tabs,
+  .dads-form-group,
+  .tenji-row-controls,
+  .tenji-row__header,
+  .dads-button {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .dads-container {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .tenji-row {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin-bottom: 20px;
+    page-break-inside: avoid;
+  }
+
+  .tenji-row__body {
+    overflow: visible;
+    flex-wrap: wrap;
+  }
+
+  .tenji-cell {
+    border: 1px solid #444;
+    page-break-inside: avoid;
+  }
+
+  .tenji-dot[aria-pressed="true"] {
+    background-color: #000000 !important;
+    border-color: #000000 !important;
+    box-shadow: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+

@@ -1,0 +1,368 @@
+/**
+ * @file dads.css
+ * @description デジタル庁デザインシステム（Digital Agency Design System）に準拠した基本スタイル・コンポーネント集
+ * 参考: https://github.com/digital-go-jp/design-system-example-components-html
+ */
+
+:root {
+  /* --- カラーパレット (デジタル庁 デザイントークン) --- */
+  --dads-color-blue-900: #001f3f;
+  --dads-color-blue-700: #002b66;
+  --dads-color-blue-600: #004098; /* メインブランドカラー */
+  --dads-color-blue-500: #0056cc;
+  --dads-color-blue-100: #e5f0ff;
+  --dads-color-blue-50:  #f0f6ff;
+
+  --dads-color-text-primary:   #1a1a1a; /* コントラスト比 7:1 以上 */
+  --dads-color-text-secondary: #4d4d4d;
+  --dads-color-text-disabled:  #808080;
+
+  --dads-color-bg-primary:   #ffffff;
+  --dads-color-bg-secondary: #f7f8fa;
+  --dads-color-bg-tertiary:  #eef1f5;
+
+  --dads-color-border-subtle: #d3d7de;
+  --dads-color-border-normal: #8f96a3;
+  --dads-color-border-dark:   #2b2e35;
+
+  /* アクセシビリティ・フォーカス用（WCAG 2.1 AA 準拠の高視認イエロー） */
+  --dads-color-focus:        #f6c000;
+  --dads-color-focus-border: #1a1a1a;
+
+  /* アラート・危険色 */
+  --dads-color-danger:       #c9171e;
+  --dads-color-danger-hover: #9e0e14;
+  --dads-color-danger-bg:    #fdf0f0;
+
+  /* --- タイポグラフィ --- */
+  --dads-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, sans-serif;
+  --dads-font-size-xs: 0.75rem;   /* 12px */
+  --dads-font-size-sm: 0.875rem;  /* 14px */
+  --dads-font-size-md: 1rem;      /* 16px (ベース) */
+  --dads-font-size-lg: 1.125rem;  /* 18px */
+  --dads-font-size-xl: 1.25rem;   /* 20px */
+  --dads-font-size-2xl: 1.5rem;   /* 24px */
+
+  --dads-line-height-tight: 1.3;
+  --dads-line-height-normal: 1.6;
+
+  /* --- スペーシング --- */
+  --dads-space-1: 4px;
+  --dads-space-2: 8px;
+  --dads-space-3: 12px;
+  --dads-space-4: 16px;
+  --dads-space-5: 20px;
+  --dads-space-6: 24px;
+  --dads-space-8: 32px;
+  --dads-space-10: 40px;
+
+  /* --- 角丸・シャドウ --- */
+  --dads-radius-sm: 4px;
+  --dads-radius-md: 8px;
+  --dads-radius-lg: 12px;
+  --dads-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --dads-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* --- リセット & 基本設定 --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--dads-font-family);
+  font-size: var(--dads-font-size-md);
+  line-height: var(--dads-line-height-normal);
+  color: var(--dads-color-text-primary);
+  background-color: var(--dads-color-bg-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* フォーカスリング共通（キーボード操作対応） */
+:focus-visible {
+  outline: 3px solid var(--dads-color-focus) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 1px var(--dads-color-focus-border) !important;
+}
+
+/* スクリーンリーダー専用隠しテキスト */
+.visually-hidden,
+.dads-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- レイアウトコンテナ --- */
+.dads-container {
+  width: 100%;
+  max-width: 1120px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--dads-space-4);
+  padding-right: var(--dads-space-4);
+}
+
+/* --- ヘッダー --- */
+.dads-header {
+  border-bottom: 2px solid var(--dads-color-blue-600);
+  background-color: var(--dads-color-bg-primary);
+  padding: var(--dads-space-3) 0;
+}
+
+.dads-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--dads-space-3);
+}
+
+.dads-header__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--dads-space-2);
+  text-decoration: none;
+  color: var(--dads-color-text-primary);
+  font-weight: 700;
+  font-size: var(--dads-font-size-xl);
+}
+
+.dads-header__logo img,
+.dads-header__logo svg {
+  width: 28px;
+  height: 28px;
+}
+
+.dads-header__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--dads-space-3);
+  font-size: var(--dads-font-size-sm);
+}
+
+.dads-header__github {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dads-space-1);
+  color: var(--dads-color-text-secondary);
+  text-decoration: none;
+  padding: var(--dads-space-1) var(--dads-space-2);
+  border-radius: var(--dads-radius-sm);
+  transition: background-color 0.15s ease;
+}
+
+.dads-header__github:hover {
+  background-color: var(--dads-color-bg-secondary);
+  color: var(--dads-color-text-primary);
+}
+
+/* --- タブコンポーネント (ARIA準拠) --- */
+.dads-tabs {
+  margin: var(--dads-space-6) 0 var(--dads-space-4);
+}
+
+.dads-tab-list {
+  display: flex;
+  gap: var(--dads-space-2);
+  border-bottom: 2px solid var(--dads-color-border-subtle);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dads-tab-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dads-space-2);
+  padding: var(--dads-space-3) var(--dads-space-5);
+  font-family: inherit;
+  font-size: var(--dads-font-size-lg);
+  font-weight: 700;
+  color: var(--dads-color-text-secondary);
+  background: none;
+  border: none;
+  border-bottom: 4px solid transparent;
+  cursor: pointer;
+  margin-bottom: -2px;
+  transition: all 0.15s ease;
+  border-radius: var(--dads-radius-sm) var(--dads-radius-sm) 0 0;
+}
+
+.dads-tab-button:hover {
+  color: var(--dads-color-blue-600);
+  background-color: var(--dads-color-blue-50);
+}
+
+.dads-tab-button[aria-selected="true"] {
+  color: var(--dads-color-blue-600);
+  border-bottom-color: var(--dads-color-blue-600);
+  background-color: transparent;
+}
+
+.dads-tab-panel {
+  display: none;
+  padding: var(--dads-space-4) 0;
+}
+
+.dads-tab-panel.is-active {
+  display: block;
+}
+
+/* --- ボタンスタイル --- */
+.dads-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dads-space-2);
+  font-family: inherit;
+  font-size: var(--dads-font-size-md);
+  font-weight: 600;
+  line-height: 1.4;
+  padding: 10px 20px;
+  border-radius: var(--dads-radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dads-button--primary {
+  background-color: var(--dads-color-blue-600);
+  color: #ffffff;
+  border-color: var(--dads-color-blue-600);
+}
+
+.dads-button--primary:hover {
+  background-color: var(--dads-color-blue-700);
+  border-color: var(--dads-color-blue-700);
+}
+
+.dads-button--secondary {
+  background-color: #ffffff;
+  color: var(--dads-color-blue-600);
+  border-color: var(--dads-color-blue-600);
+}
+
+.dads-button--secondary:hover {
+  background-color: var(--dads-color-blue-50);
+}
+
+.dads-button--danger {
+  background-color: var(--dads-color-danger);
+  color: #ffffff;
+  border-color: var(--dads-color-danger);
+}
+
+.dads-button--danger:hover {
+  background-color: var(--dads-color-danger-hover);
+  border-color: var(--dads-color-danger-hover);
+}
+
+.dads-button--text {
+  background: transparent;
+  color: var(--dads-color-blue-600);
+  border-color: transparent;
+  padding: var(--dads-space-2) var(--dads-space-3);
+  text-decoration: underline;
+}
+
+.dads-button--text:hover {
+  background-color: var(--dads-color-blue-50);
+}
+
+.dads-button--sm {
+  font-size: var(--dads-font-size-sm);
+  padding: 6px 14px;
+}
+
+.dads-button:disabled {
+  background-color: var(--dads-color-bg-secondary);
+  color: var(--dads-color-text-disabled);
+  border-color: var(--dads-color-border-subtle);
+  cursor: not-allowed;
+}
+
+/* --- フォーム入力・コントロール --- */
+.dads-form-group {
+  margin-bottom: var(--dads-space-5);
+}
+
+.dads-label {
+  display: block;
+  font-weight: 700;
+  font-size: var(--dads-font-size-md);
+  margin-bottom: var(--dads-space-2);
+  color: var(--dads-color-text-primary);
+}
+
+.dads-helper-text {
+  display: block;
+  font-size: var(--dads-font-size-sm);
+  color: var(--dads-color-text-secondary);
+  margin-top: var(--dads-space-1);
+}
+
+.dads-input-group {
+  display: flex;
+  gap: var(--dads-space-2);
+  flex-wrap: wrap;
+}
+
+.dads-input-text {
+  flex: 1 1 260px;
+  font-family: inherit;
+  font-size: var(--dads-font-size-md);
+  padding: 10px 14px;
+  border: 2px solid var(--dads-color-border-normal);
+  border-radius: var(--dads-radius-sm);
+  color: var(--dads-color-text-primary);
+  background-color: #ffffff;
+  transition: border-color 0.15s ease;
+}
+
+.dads-input-text:focus {
+  border-color: var(--dads-color-blue-600);
+}
+
+.dads-input-text:disabled {
+  background-color: var(--dads-color-bg-secondary);
+  color: var(--dads-color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* --- カード・枠 --- */
+.dads-card {
+  background-color: #ffffff;
+  border: 1px solid var(--dads-color-border-subtle);
+  border-radius: var(--dads-radius-md);
+  padding: var(--dads-space-5);
+  margin-bottom: var(--dads-space-5);
+  box-shadow: var(--dads-shadow-sm);
+}
+
+/* --- フッター --- */
+.dads-footer {
+  margin-top: var(--dads-space-10);
+  padding: var(--dads-space-6) 0;
+  border-top: 1px solid var(--dads-color-border-subtle);
+  background-color: var(--dads-color-bg-secondary);
+  font-size: var(--dads-font-size-sm);
+  color: var(--dads-color-text-secondary);
+}
+
+.dads-footer a {
+  color: var(--dads-color-blue-600);
+  text-decoration: underline;
+}
+
+.dads-footer a:hover {
+  text-decoration: none;
+}
