@@ -224,12 +224,12 @@ function handleAddNewRow() {
 
 /**
  * 入力されたひらがな文字列から点字マス列を生成・表示します。
+ * 入力欄を非活性化せず、常に編集・追加入力が可能な状態を維持します。
  */
 function handleKanaTranslate() {
   const inputEl = document.getElementById("kana-input");
   const outputContainer = document.getElementById("kana-output-container");
-  const toggleBtn = document.getElementById("btn-kana-translate");
-  if (!inputEl || !outputContainer || !toggleBtn) return;
+  if (!inputEl || !outputContainer) return;
 
   const text = inputEl.value.trim();
   if (text.length === 0) {
@@ -255,28 +255,18 @@ function handleKanaTranslate() {
     });
     outputContainer.appendChild(cellEl);
   });
-
-  // ボタンを「入力をクリア」状態に切り替え
-  inputEl.disabled = true;
-  toggleBtn.textContent = "入力をクリア";
-  toggleBtn.className = "dads-button dads-button--danger";
 }
 
 /**
- * ひらがな入力フォームを初期状態に戻します。
+ * ひらがな入力フォームをクリアして初期状態に戻します。
  */
-function handleKanaReset() {
+function handleKanaClear() {
   const inputEl = document.getElementById("kana-input");
   const outputContainer = document.getElementById("kana-output-container");
-  const toggleBtn = document.getElementById("btn-kana-translate");
-  if (!inputEl || !outputContainer || !toggleBtn) return;
+  if (!inputEl || !outputContainer) return;
 
   inputEl.value = "";
-  inputEl.disabled = false;
   inputEl.focus();
-
-  toggleBtn.textContent = "点字に変換";
-  toggleBtn.className = "dads-button dads-button--primary";
 
   outputContainer.innerHTML = `
     <div class="tenji-kana-empty-hint">
@@ -336,26 +326,30 @@ document.addEventListener("DOMContentLoaded", () => {
     addRowBtn.addEventListener("click", handleAddNewRow);
   }
 
-  // 3. ひらがなモード: 変換・リセットボタン
+  // 3. ひらがなモード: リアルタイム変換・ボタン変換・クリアボタン
   const translateBtn = document.getElementById("btn-kana-translate");
+  const clearBtn = document.getElementById("btn-kana-clear");
   const inputEl = document.getElementById("kana-input");
 
-  if (translateBtn && inputEl) {
-    translateBtn.addEventListener("click", () => {
-      if (inputEl.disabled) {
-        handleKanaReset();
-      } else {
-        handleKanaTranslate();
-      }
-    });
+  if (inputEl) {
+    // 文字の入力・変換確定のたびにリアルタイム更新
+    inputEl.addEventListener("input", handleKanaTranslate);
 
     // Enterキーでも変換を実行
     inputEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !inputEl.disabled) {
+      if (e.key === "Enter") {
         e.preventDefault();
         handleKanaTranslate();
       }
     });
+  }
+
+  if (translateBtn) {
+    translateBtn.addEventListener("click", handleKanaTranslate);
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", handleKanaClear);
   }
 
   // 4. 点字モードの初期描画
