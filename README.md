@@ -1,4 +1,7 @@
-# 点字学習・変換アプリケーション（日本語）
+# 点字学習・変換アプリケーション（日本語向け）
+
+[![Release](https://github.com/masapico/tenji/actions/workflows/release.yml/badge.svg)](https://github.com/masapico/tenji/actions/workflows/release.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/masapico/tenji)](https://github.com/masapico/tenji/releases)
 
 [点字 - Tenji](https://masapico.github.io/tenji/)
 
