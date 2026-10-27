@@ -241,38 +241,47 @@ export const identifyTenji = (value) => {
 
 /**
  * 複数マスの点字列（6桁文字列の配列）を解析し、濁点・拗音の合成を考慮してひらがな配列に変換します。
+ * 前置符（濁点・半濁点・拗音など）は直後に隣接する1マスにのみ適用され、
+ * 空マス・未定義マス・連続する前置符などで持ち越されることはありません。
  *
  * @param {string[]} values - 点字バイナリ文字列の配列（例: ["000010", "100001"]）
  * @returns {string[]} 各マス位置に対応するひらがなの配列（結合記号の前置マスは全角空白 "　"）
  */
 export const identifyTenjiArray = (values) => {
+  if (!Array.isArray(values)) {
+    return [];
+  }
+
   const chars = [];
-  const cmb = [];
+  let pendingPrefix = null;
 
   values.forEach((value) => {
-    if (TenjiMap[value]) {
-      const char = TenjiMap[value];
-      if (char.startsWith("cmb")) {
-        // 濁点・拗音などの前置記号を保持し、このマスは空白プレースホルダとする
-        cmb.push(value);
-        chars.push("　");
-      } else {
-        if (cmb.length !== 0) {
-          // 組合せパターンの値（前置6桁 + 現在6桁 = 12桁）
-          const cmbValue = `${cmb[0]}${value}`;
-          cmb.pop(); // 組合せ判定後に消費
-          if (TenjiCombinationMap[cmbValue]) {
-            chars.push(TenjiCombinationMap[cmbValue]);
-          } else {
-            chars.push(char);
-          }
-        } else {
-          chars.push(char);
-        }
-      }
-    } else {
-      // TenjiMapに存在しない場合（全て0など）
+    const char = TenjiMap[value];
+
+    if (char && char.startsWith("cmb")) {
+      // 現在のマスが前置符の場合:
+      // 直前に保留されていた前置符があったとしても消費・破棄し、現在の前置符を保留する
+      pendingPrefix = value;
       chars.push("　");
+    } else {
+      // 現在のマスが前置符以外（清音、記号、またはTenjiMapに未定義/空マス）の場合:
+      if (pendingPrefix !== null) {
+        // 直前の前置符との合成を試みる（必ず消費し持ち越さない）
+        const cmbValue = `${pendingPrefix}${value}`;
+        pendingPrefix = null;
+
+        if (TenjiCombinationMap[cmbValue]) {
+          chars.push(TenjiCombinationMap[cmbValue]);
+        } else if (char) {
+          // 合成パターンが存在しない既知の文字（例: 濁点＋あ 等）
+          chars.push(char);
+        } else {
+          // TenjiMapに存在しない（空マスや未定義）
+          chars.push("　");
+        }
+      } else {
+        chars.push(char || "　");
+      }
     }
   });
 

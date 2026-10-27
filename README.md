@@ -48,6 +48,8 @@ tenji/
 │   ├── tenji-core.js     # 点字相互変換コアアルゴリズム（ES Modules）
 │   ├── tenji-data.js     # 点字五十音表・文字データおよび構造定義
 │   └── app.js            # UI制御・DOMイベント・状態管理
+├── test/
+│   └── tenji-core.test.js # 回帰テストスイート
 ├── tenjimap.json         # 点字定義データ（CC BY 4.0）
 └── tenji.svg             # アプリアイコン
 ```
@@ -64,6 +66,17 @@ tenji/
 
 ### 2. Webサーバーに配置する場合
 そのままWebサーバーに格納し、index.html へアクセスすると利用できます。
+
+### 3. テストの実行
+Node.js または macOS 標準の JavaScriptCore (`jsc`) で依存パッケージなしにテストを実行できます。
+
+```bash
+# Node.js で実行する場合
+node test/tenji-core.test.js
+
+# または macOS の jsc で実行する場合
+/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Helpers/jsc -m test/tenji-core.test.js
+```
 
 ---
 
