@@ -75,6 +75,8 @@ let currentDetailItem = null;
  * @param {string} options.kana - 対応するひらがな文字 (例: "あ")
  * @param {boolean} [options.editable=true] - ドットをクリック可能にするかどうか
  * @param {boolean} [options.showDotNumbers=false] - 点番号バッジを表示するかどうか
+ * @param {number} [options.rowIndex=null] - 所属する行インデックス
+ * @param {number} [options.cellIndex=null] - 行内のマスインデックス
  * @param {Function} [options.onDotToggle=null] - ドット切り替え時のコールバック (dotIndex, newCellValue) => void
  * @returns {HTMLElement} 点字マスのDOM要素
  */
@@ -83,11 +85,15 @@ function createTenjiCellElement({
   kana = "　",
   editable = true,
   showDotNumbers = false,
+  rowIndex = null,
+  cellIndex = null,
   onDotToggle = null,
 }) {
   const cell = document.createElement("div");
   cell.className = `tenji-cell ${editable ? "" : "tenji-cell--readonly"}`;
   cell.setAttribute("role", "group");
+  if (cellIndex !== null) cell.dataset.cellIndex = cellIndex;
+  if (rowIndex !== null) cell.dataset.rowIndex = rowIndex;
 
   const tooltip = identifyTenji(cellValue) || (kana.trim() ? kana : "空マス");
   const dots = getDotNumbers(cellValue);
@@ -107,6 +113,7 @@ function createTenjiCellElement({
     const dotBtn = document.createElement("button");
     dotBtn.type = "button";
     dotBtn.className = "tenji-dot";
+    dotBtn.dataset.dotIndex = index;
     dotBtn.setAttribute("aria-pressed", isPressed ? "true" : "false");
     dotBtn.setAttribute("aria-label", `${label}: ${isPressed ? "オン" : "オフ"}`);
 
@@ -114,7 +121,10 @@ function createTenjiCellElement({
       dotBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         // 現在のビット列を更新
-        const bits = cellValue.split("");
+        const currentBits = (rowIndex !== null && cellIndex !== null && tenjiRows[rowIndex])
+          ? tenjiRows[rowIndex][cellIndex]
+          : cellValue;
+        const bits = currentBits.split("");
         bits[index] = bits[index] === "1" ? "0" : "1";
         const newCellValue = bits.join("");
 
@@ -232,6 +242,61 @@ function createComboCardElement(item) {
 // =============================================================================
 
 /**
+ * 特定の点字行のDOMをインプレース更新します。
+ * DOM要素全体を再構築しないため、フォーカス位置やスクロールが外れません。
+ *
+ * @param {number} rowIndex
+ */
+function updateTenjiRowDom(rowIndex) {
+  const container = document.getElementById("tenji-rows-container");
+  if (!container) return;
+
+  const rowWrapper = container.children[rowIndex];
+  if (!rowWrapper) return;
+
+  const rowValues = tenjiRows[rowIndex];
+  const kanaArray = identifyTenjiArray(rowValues);
+  const rowBody = rowWrapper.querySelector(".tenji-row__body");
+  if (!rowBody) return;
+
+  const cellElements = rowBody.querySelectorAll(".tenji-cell");
+  cellElements.forEach((cellEl, cIdx) => {
+    const val = rowValues[cIdx];
+    const kana = kanaArray[cIdx];
+    const tooltip = identifyTenji(val) || (kana.trim() ? kana : "空マス");
+    const dots = getDotNumbers(val);
+    const dotsText = formatDotNumbers(dots);
+
+    cellEl.setAttribute("aria-label", `点字マス: ${tooltip} (${dotsText})`);
+    cellEl.setAttribute("title", `${tooltip} (${dotsText})`);
+
+    // 各ドットボタンの aria-pressed / aria-label を更新
+    const dotButtons = cellEl.querySelectorAll(".tenji-dot");
+    dotButtons.forEach((dotBtn) => {
+      const dIdx = parseInt(dotBtn.dataset.dotIndex, 10);
+      const isPressed = val[dIdx] === "1";
+      dotBtn.setAttribute("aria-pressed", isPressed ? "true" : "false");
+      const dotDef = DOT_DEFINITIONS[dIdx];
+      if (dotDef) {
+        dotBtn.setAttribute("aria-label", `${dotDef.label}: ${isPressed ? "オン" : "オフ"}`);
+      }
+    });
+
+    // 文字ラベル更新
+    const charLabel = cellEl.querySelector(".tenji-cell__char");
+    if (charLabel) {
+      charLabel.textContent = kana;
+    }
+
+    // 点番号バッジ更新
+    const badge = cellEl.querySelector(".tenji-dot-numbers");
+    if (badge) {
+      badge.textContent = dots.length > 0 ? dots.join("・") : "-";
+    }
+  });
+}
+
+/**
  * 点字入力モードの全行を画面に再描画します。
  */
 function renderTenjiRows() {
@@ -282,9 +347,12 @@ function renderTenjiRows() {
         kana: kanaArray[cellIndex],
         editable: true,
         showDotNumbers: true,
+        rowIndex,
+        cellIndex,
         onDotToggle: (_dotIndex, newCellValue) => {
           rowValues[cellIndex] = newCellValue;
-          renderTenjiRows();
+          // DOMを破棄せず、行内をインプレース更新（フォーカスが外れない）
+          updateTenjiRowDom(rowIndex);
         },
       });
       rowBody.appendChild(cellElement);
@@ -905,14 +973,27 @@ export function switchTab(mode) {
 // 初期化 (DOM Ready)
 // =============================================================================
 
-document.addEventListener("DOMContentLoaded", () => {
-  // 1. タブ切り替えイベント
+function initApp() {
+  // 1. タブ切り替えイベント（直接登録 ＋ イベント委譲による二重保護）
+  const tabList = document.querySelector(".dads-tab-list");
+  if (tabList) {
+    tabList.addEventListener("click", (e) => {
+      const btn = e.target.closest(".dads-tab-button");
+      if (!btn) return;
+      if (btn.id === "tab-tenji") switchTab("tenji");
+      else if (btn.id === "tab-kana") switchTab("kana");
+      else if (btn.id === "tab-chart") switchTab("chart");
+    });
+  }
+
   const tabTenji = document.getElementById("tab-tenji");
   const tabKana = document.getElementById("tab-kana");
   const tabChart = document.getElementById("tab-chart");
 
-  if (tabTenji && tabKana) {
+  if (tabTenji) {
     tabTenji.addEventListener("click", () => switchTab("tenji"));
+  }
+  if (tabKana) {
     tabKana.addEventListener("click", () => switchTab("kana"));
   }
   if (tabChart) {
@@ -1009,4 +1090,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 7. 点字モードの初期描画
   renderTenjiRows();
-});
+}
+
+// DOMContentLoaded 発火済みでも即時実行できる安全な初期化
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
+}
