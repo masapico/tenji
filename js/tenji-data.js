@@ -70,7 +70,7 @@ export function getTenjiPatternDetails(bits) {
 export const GOJUON_MATRIX = {
   columns: [
     { key: "a", label: "あ段", vowelDots: "1の点" },
-    { key: "i", label: "いだん", vowelDots: "1・2の点" },
+    { key: "i", label: "い段", vowelDots: "1・2の点" },
     { key: "u", label: "う段", vowelDots: "1・4の点" },
     { key: "e", label: "え段", vowelDots: "1・2・4の点" },
     { key: "o", label: "お段", vowelDots: "2・4の点" },

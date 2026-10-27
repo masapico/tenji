@@ -898,34 +898,6 @@ function handleTryInTenjiMode() {
   }
 }
 
-/**
- * 現在のモーダルの文字と点番号を音声合成で読み上げます。
- */
-function handleSpeakChar() {
-  if (!currentDetailItem) return;
-
-  if (!("speechSynthesis" in window)) {
-    alert("お使いのブラウザは音声読み上げに対応していません。");
-    return;
-  }
-
-  window.speechSynthesis.cancel(); // 既存の読み上げを停止
-
-  const pattern = getTenjiPatternDetails(currentDetailItem.bits);
-  let text = `${currentDetailItem.char}。`;
-
-  if (pattern.cells.length === 1) {
-    text += `${pattern.summary}。`;
-  } else if (pattern.cells.length === 2) {
-    text += `2マス構成。前置、${formatDotNumbers(pattern.cells[0].dots)}。本体、${formatDotNumbers(pattern.cells[1].dots)}。`;
-  }
-
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "ja-JP";
-  utterance.rate = 0.9; // やや聞き取りやすいゆっくりめの速度
-  window.speechSynthesis.speak(utterance);
-}
-
 // =============================================================================
 // タブ・モード切替 (WAI-ARIA Tabs パターン)
 // =============================================================================
@@ -1064,7 +1036,6 @@ function initApp() {
   // 6. 文字詳細ダイアログイベント
   const closeDialogBtn = document.getElementById("btn-dialog-close");
   const tryDialogBtn = document.getElementById("btn-dialog-try");
-  const speakDialogBtn = document.getElementById("btn-dialog-speak");
   const dialog = document.getElementById("char-detail-dialog");
 
   if (closeDialogBtn) {
@@ -1073,10 +1044,6 @@ function initApp() {
 
   if (tryDialogBtn) {
     tryDialogBtn.addEventListener("click", handleTryInTenjiMode);
-  }
-
-  if (speakDialogBtn) {
-    speakDialogBtn.addEventListener("click", handleSpeakChar);
   }
 
   // ダイアログ外（backdrop）クリックで閉じる
