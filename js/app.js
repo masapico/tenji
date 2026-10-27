@@ -277,7 +277,7 @@ function updateTenjiRowDom(rowIndex) {
       const dIdx = parseInt(dotBtn.dataset.dotIndex, 10);
       const isPressed = val[dIdx] === "1";
       dotBtn.setAttribute("aria-pressed", isPressed ? "true" : "false");
-      const dotDef = DOT_DEFINITIONS[dIdx];
+      const dotDef = DOT_DEFINITIONS.find((def) => def.index === dIdx);
       if (dotDef) {
         dotBtn.setAttribute("aria-label", `${dotDef.label}: ${isPressed ? "オン" : "オフ"}`);
       }
