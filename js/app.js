@@ -9,6 +9,7 @@ import {
   identifyTenji,
   identifyTenjiArray,
   getTenjiValues,
+  convertKanaToTenji,
 } from "./tenji-core.js";
 import {
   GOJUON_MATRIX,
@@ -408,14 +409,24 @@ function handleAddNewRow() {
 
 /**
  * 入力されたひらがな文字列から点字マス列を生成・表示します。
+ * 未対応の文字（数字や未登録記号等）を検知した場合は利用者に通知し、変換処理を停止します。
  */
 function handleKanaTranslate() {
   const inputEl = document.getElementById("kana-input");
   const outputContainer = document.getElementById("kana-output-container");
+  const errorEl = document.getElementById("kana-input-error");
   if (!inputEl || !outputContainer) return;
 
-  const text = inputEl.value.trim();
-  if (text.length === 0) {
+  const text = inputEl.value;
+  const trimmed = text.trim();
+
+  // 空文字の場合はエラー通知を解除して初期ヒントを表示
+  if (trimmed.length === 0) {
+    if (errorEl) {
+      errorEl.textContent = "";
+      errorEl.style.display = "none";
+    }
+    inputEl.removeAttribute("aria-invalid");
     outputContainer.innerHTML = `
       <div class="tenji-kana-empty-hint">
         上の入力欄にひらがなを入力すると、ここに点字が表示されます。
@@ -423,8 +434,41 @@ function handleKanaTranslate() {
     return;
   }
 
-  // 1. ひらがなから点字バイナリ配列を抽出
-  const tenjiValues = getTenjiValues(text);
+  // 1. ひらがなから点字バイナリ変換を検証・実行
+  const result = convertKanaToTenji(text);
+
+  // 未対応文字が検出された場合: 利用者に通知し、変換処理を停止
+  if (!result.success) {
+    if (errorEl) {
+      const charList = result.unsupportedChars.map((c) => `「${c}」`).join("、");
+      errorEl.textContent = `⚠️ 未対応の文字が含まれています: ${charList}。点字（ひらがな・記号）に対応した文字を入力してください。`;
+      errorEl.style.display = "block";
+    }
+    inputEl.setAttribute("aria-invalid", "true");
+
+    outputContainer.innerHTML = `
+      <div class="tenji-kana-empty-hint tenji-kana-error-hint">
+        未対応の文字が含まれているため、点字への変換を停止しています。入力を修正してください。
+      </div>`;
+    return;
+  }
+
+  // 正常な場合: エラー通知を解除
+  if (errorEl) {
+    errorEl.textContent = "";
+    errorEl.style.display = "none";
+  }
+  inputEl.removeAttribute("aria-invalid");
+
+  const tenjiValues = result.tenjiValues;
+  if (tenjiValues.length === 0) {
+    outputContainer.innerHTML = `
+      <div class="tenji-kana-empty-hint">
+        上の入力欄にひらがなを入力すると、ここに点字が表示されます。
+      </div>`;
+    return;
+  }
+
   // 2. 点字バイナリ配列から各マスのひらがな文字配列を取得
   const kanaChars = identifyTenjiArray(tenjiValues);
 
@@ -447,10 +491,17 @@ function handleKanaTranslate() {
 function handleKanaClear() {
   const inputEl = document.getElementById("kana-input");
   const outputContainer = document.getElementById("kana-output-container");
+  const errorEl = document.getElementById("kana-input-error");
   if (!inputEl || !outputContainer) return;
 
   inputEl.value = "";
+  inputEl.removeAttribute("aria-invalid");
   inputEl.focus();
+
+  if (errorEl) {
+    errorEl.textContent = "";
+    errorEl.style.display = "none";
+  }
 
   outputContainer.innerHTML = `
     <div class="tenji-kana-empty-hint">

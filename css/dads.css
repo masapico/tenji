@@ -310,6 +310,14 @@ body {
   margin-top: var(--dads-space-1);
 }
 
+.dads-error-text {
+  display: block;
+  font-size: var(--dads-font-size-sm);
+  color: var(--dads-color-danger);
+  font-weight: 700;
+  margin-top: var(--dads-space-2);
+}
+
 .dads-input-group {
   display: flex;
   gap: var(--dads-space-2);
@@ -330,6 +338,16 @@ body {
 
 .dads-input-text:focus {
   border-color: var(--dads-color-blue-600);
+}
+
+.dads-input-text[aria-invalid="true"] {
+  border-color: var(--dads-color-danger);
+  box-shadow: 0 0 0 1px var(--dads-color-danger);
+}
+
+.dads-input-text[aria-invalid="true"]:focus {
+  border-color: var(--dads-color-danger);
+  outline: 3px solid var(--dads-color-focus);
 }
 
 .dads-input-text:disabled {

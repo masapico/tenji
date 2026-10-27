@@ -134,6 +134,7 @@
             <span class="dads-helper-text" id="kana-input-helper">
               点字（凸面）に変換したいひらがなを入力してください（例: こんにちは、がっこう、きょう）
             </span>
+            <div id="kana-input-error" class="dads-error-text" role="alert" aria-live="polite" style="display: none;"></div>
             <div class="dads-input-group" style="margin-top: var(--dads-space-2);">
               <input
                 type="text"
@@ -141,7 +142,7 @@
                 class="dads-input-text"
                 placeholder="文字を入力..."
                 autocomplete="off"
-                aria-describedby="kana-input-helper"
+                aria-describedby="kana-input-helper kana-input-error"
               />
               <button
                 type="button"

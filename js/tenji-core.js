@@ -280,52 +280,130 @@ export const identifyTenjiArray = (values) => {
 };
 
 /**
- * 日本語（ひらがな）文字列から、対応する点字バイナリ列（6桁文字列の配列）を生成します。
- * 濁音・拗音などの2マス合成音は2つの6桁文字列に展開されます。
+ * ひらがな・記号から点字マス（6桁文字列の配列）への逆引き対応表
+ * @type {Record<string, string[]>}
+ */
+export const KanaToTenjiMap = {};
+
+// 1. 2マスで表現される組合せ音（濁音・半濁音・拗音・特殊音など）を登録
+for (const [code, char] of Object.entries(TenjiCombinationMap)) {
+  KanaToTenjiMap[char] = [code.substring(0, 6), code.substring(6, 12)];
+}
+
+// 2. 1マスで表現される清音・記号を登録（cmbプレフィックスは除外）
+for (const [code, char] of Object.entries(TenjiMap)) {
+  if (!char.startsWith("cmb")) {
+    KanaToTenjiMap[char] = [code];
+  }
+}
+
+/**
+ * ひらがな文字列を走査し、対応する点字バイナリ列（6桁文字列の配列）へ変換します。
+ * 元の文字列と生成コードを混在させずにテキストを前から走査し、未対応文字（数字など）を検知します。
+ * 未対応文字が含まれる場合は変換を中断し、エラー情報（未対応文字の一覧）を返します。
  *
  * @param {string} words - ひらがな文字列（例: "がっこう"）
- * @returns {string[]} 6桁点字バイナリの配列（例: ["000010", "100001", "010000", "010101", "100100"]）
+ * @returns {{
+ *   success: boolean,
+ *   tenjiValues: string[],
+ *   unsupportedChars: string[],
+ *   errorMessage: string | null
+ * }} 変換結果オブジェクト
  */
-export const getTenjiValues = (words) => {
+export const convertKanaToTenji = (words) => {
   if (!words || typeof words !== "string") {
-    return [];
+    return {
+      success: true,
+      tenjiValues: [],
+      unsupportedChars: [],
+      errorMessage: null,
+    };
   }
 
-  // 処理に影響のある空白文字を一旦除去
-  const regexSpace = /\s/g;
-  let tmp = words.replace(regexSpace, "");
-
-  // 1. 2マスで表現される組合せ音（濁音・拗音・特殊音など）を優先して展開
-  const cmbKeys = Object.keys(TenjiCombinationMap);
-  cmbKeys.forEach((key) => {
-    const textTarget = TenjiCombinationMap[key];
-    if (tmp.includes(textTarget)) {
-      // 12桁を「前置6桁 + 半角空白 + 後続6桁 + 半角空白」に置換
-      const replaceValue = `${key.substring(0, 6)} ${key.substring(6, key.length)} `;
-      const regex = new RegExp(textTarget, "g");
-      tmp = tmp.replace(regex, replaceValue);
-    }
-  });
-
-  // 2. 1マスで表現される清音・記号を展開
-  const keys = Object.keys(TenjiMap);
-  keys.forEach((key) => {
-    const textTarget = TenjiMap[key];
-    if (tmp.includes(textTarget)) {
-      const regex = new RegExp(textTarget, "g");
-      tmp = tmp.replace(regex, `${key} `);
-    }
-  });
-
-  // 3. マッピングにない文字（半角数字とスペース以外）は空白マス "000000 " に置換
-  const regexNotNumber = /[^0-9 ]/g;
-  tmp = tmp.replace(regexNotNumber, "000000 ");
-
-  const trimmed = tmp.trim();
+  const trimmed = words.trim();
   if (trimmed.length === 0) {
-    return [];
+    return {
+      success: true,
+      tenjiValues: [],
+      unsupportedChars: [],
+      errorMessage: null,
+    };
   }
 
-  return trimmed.split(/\s+/);
+  const tenjiValues = [];
+  const unsupportedChars = [];
+  let i = 0;
+  const n = trimmed.length;
+
+  while (i < n) {
+    // 空白文字（半角スペース・全角スペース等）は点字のマス空け（000000）として扱う
+    if (/\s/.test(trimmed[i])) {
+      while (i < n && /\s/.test(trimmed[i])) {
+        i++;
+      }
+      tenjiValues.push("000000");
+      continue;
+    }
+
+    // 2文字の組合せ（拗音など: きゃ、しゃ等）を優先マッチ
+    if (i + 1 < n) {
+      const twoChars = trimmed.substring(i, i + 2);
+      if (KanaToTenjiMap[twoChars]) {
+        tenjiValues.push(...KanaToTenjiMap[twoChars]);
+        i += 2;
+        continue;
+      }
+    }
+
+    // 1文字のマッチ（清音、促音、長音、濁音1文字表記「が」等）
+    const oneChar = trimmed[i];
+    if (KanaToTenjiMap[oneChar]) {
+      tenjiValues.push(...KanaToTenjiMap[oneChar]);
+      i += 1;
+      continue;
+    }
+
+    // 未対応文字（数字、アルファベット、未対応漢字など）
+    unsupportedChars.push(oneChar);
+    i += 1;
+  }
+
+  // 重複を除去した未対応文字リスト
+  const uniqueUnsupported = Array.from(new Set(unsupportedChars));
+
+  if (uniqueUnsupported.length > 0) {
+    return {
+      success: false,
+      tenjiValues: [],
+      unsupportedChars: uniqueUnsupported,
+      errorMessage: `未対応の文字が含まれています: ${uniqueUnsupported.map((c) => `"${c}"`).join(", ")}`,
+    };
+  }
+
+  return {
+    success: true,
+    tenjiValues,
+    unsupportedChars: [],
+    errorMessage: null,
+  };
+};
+
+/**
+ * 日本語（ひらがな）文字列から、対応する点字バイナリ列（6桁文字列の配列）を生成します。
+ * 未対応の文字（数字や未登録記号）が含まれている場合は処理を停止し、空配列を返します。
+ *
+ * @param {string} words - ひらがな文字列（例: "がっこう"）
+ * @param {{ throwOnError?: boolean }} [options] - オプション（throwOnError が true の場合は未対応文字で例外を投げます）
+ * @returns {string[]} 6桁点字バイナリの配列（未対応文字がある場合は空配列）
+ */
+export const getTenjiValues = (words, options = {}) => {
+  const result = convertKanaToTenji(words);
+  if (!result.success) {
+    if (options && options.throwOnError) {
+      throw new Error(result.errorMessage || "未対応の文字が含まれています");
+    }
+    return [];
+  }
+  return result.tenjiValues;
 };
 
