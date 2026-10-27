@@ -7,7 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="./tenji.svg" />
     <meta
       name="description"
-      content="点字（凸面）の学習および点字とひらがなの相互変換ができるWebアプリケーションです。ビルド不要で動作し、アクセシビリティに配慮しています。"
+      content="点字（凸面）の学習および点字とひらがなの相互変換、五十音・濁音・拗音の一覧参照ができるWebアプリケーションです。ビルド不要で動作し、アクセシビリティに配慮しています。"
     />
 
     <!-- スタイルシート (デジタル庁デザインシステム + 点字スタイル) -->
@@ -74,6 +74,18 @@
               aria-controls="panel-kana"
             >
               ひらがな → 点字
+            </button>
+          </li>
+          <li role="presentation">
+            <button
+              type="button"
+              id="tab-chart"
+              class="dads-tab-button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="panel-chart"
+            >
+              文字一覧（五十音表）
             </button>
           </li>
         </ul>
@@ -162,7 +174,112 @@
           </div>
         </div>
       </section>
+
+      <!-- タブパネル 3: 文字一覧・五十音表モード (ModeChart) -->
+      <section
+        id="panel-chart"
+        class="dads-tab-panel"
+        role="tabpanel"
+        aria-labelledby="tab-chart"
+      >
+        <!-- ガイドカード -->
+        <div class="dads-card no-print">
+          <p style="margin: 0; font-size: var(--dads-font-size-sm); color: var(--dads-color-text-secondary);">
+            <strong>点字のしくみ:</strong> 日本語点字は「母音（1・2・4の点）」に「子音の点」を加算して構成されます。文字をクリックすると詳細確認や「点字入力モードで試す」ことができます。
+          </p>
+        </div>
+
+        <!-- ツールバー（検索・点番号トグル・印刷） -->
+        <div class="tenji-chart-toolbar no-print">
+          <div class="tenji-chart-toolbar__search">
+            <label for="chart-search-input" class="dads-sr-only">文字を検索</label>
+            <input
+              type="search"
+              id="chart-search-input"
+              class="dads-input-text"
+              placeholder="文字を検索（例: きゃ、が、あ）..."
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="tenji-chart-toolbar__actions">
+            <label class="tenji-toggle-label">
+              <input type="checkbox" id="toggle-dot-numbers" checked />
+              <span>点番号を表示</span>
+            </label>
+            <button
+              type="button"
+              id="btn-chart-print"
+              class="dads-button dads-button--secondary dads-button--sm"
+              title="この一覧表を印刷（Ctrl+P）"
+            >
+              🖨️ 印刷
+            </button>
+          </div>
+        </div>
+
+        <!-- カテゴリフィルターチップ -->
+        <div class="tenji-filter-chips no-print" role="group" aria-label="文字カテゴリの絞り込み">
+          <button type="button" class="tenji-chip is-active" data-category="all">すべて</button>
+          <button type="button" class="tenji-chip" data-category="gojuon">五十音（清音）</button>
+          <button type="button" class="tenji-chip" data-category="dakuon">濁音・半濁音</button>
+          <button type="button" class="tenji-chip" data-category="youon">拗音</button>
+          <button type="button" class="tenji-chip" data-category="tokusyu">特殊音・外来音</button>
+          <button type="button" class="tenji-chip" data-category="symbols">記号</button>
+        </div>
+
+        <!-- 検索結果表示領域（検索時のみ表示） -->
+        <div id="chart-search-results" class="tenji-search-results" style="display: none;" role="region" aria-live="polite">
+          <!-- app.js で動的に挿入 -->
+        </div>
+
+        <!-- セクション・マトリクス表示領域 -->
+        <div id="chart-sections-container" class="tenji-chart-sections">
+          <!-- app.js で動的に挿入 -->
+        </div>
+      </section>
     </main>
+
+    <!-- 文字詳細ダイアログ (モーダル) -->
+    <dialog id="char-detail-dialog" class="tenji-dialog" aria-labelledby="dialog-char-title">
+      <div class="tenji-dialog__content">
+        <div class="tenji-dialog__header">
+          <h2 id="dialog-char-title" class="tenji-dialog__title">文字詳細</h2>
+          <button type="button" class="tenji-dialog__close" id="btn-dialog-close" aria-label="閉じる">✕</button>
+        </div>
+        <div class="tenji-dialog__body">
+          <div class="tenji-dialog__char-preview" id="dialog-char-preview">
+            <!-- 点字マスプレビュー -->
+          </div>
+          <div class="tenji-dialog__info">
+            <div class="tenji-dialog__info-row">
+              <span class="tenji-dialog__label">読み・文字:</span>
+              <strong class="tenji-dialog__char-name" id="dialog-char-name">-</strong>
+            </div>
+            <div class="tenji-dialog__info-row">
+              <span class="tenji-dialog__label">点番号:</span>
+              <span id="dialog-char-dots">-</span>
+            </div>
+            <div class="tenji-dialog__info-row">
+              <span class="tenji-dialog__label">分類:</span>
+              <span id="dialog-char-category">-</span>
+            </div>
+            <div class="tenji-dialog__info-row" id="dialog-char-note-row" style="display: none;">
+              <span class="tenji-dialog__label">解説:</span>
+              <span id="dialog-char-note">-</span>
+            </div>
+          </div>
+        </div>
+        <div class="tenji-dialog__footer">
+          <button type="button" id="btn-dialog-speak" class="dads-button dads-button--secondary">
+            🔊 音声で聴く
+          </button>
+          <button type="button" id="btn-dialog-try" class="dads-button dads-button--primary">
+            点字入力で試す →
+          </button>
+        </div>
+      </div>
+    </dialog>
 
     <!-- フッター -->
     <footer class="dads-footer no-print">

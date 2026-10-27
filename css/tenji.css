@@ -1,6 +1,6 @@
 /**
  * @file tenji.css
- * @description 点字マス、ドットボタン、行レイアウト、および印刷用スタイル
+ * @description 点字マス、ドットボタン、行レイアウト、文字一覧表、および印刷用スタイル
  */
 
 /* --- 点字行コンテナ --- */
@@ -138,6 +138,23 @@
   white-space: nowrap;
 }
 
+/* 点番号バッジ */
+.tenji-dot-numbers {
+  font-size: 0.72rem;
+  color: var(--dads-color-text-secondary);
+  background-color: var(--dads-color-bg-secondary);
+  padding: 1px 4px;
+  border-radius: var(--dads-radius-sm);
+  margin-top: 2px;
+  white-space: nowrap;
+  font-family: monospace, sans-serif;
+  letter-spacing: -0.5px;
+}
+
+.hide-dot-numbers .tenji-dot-numbers {
+  display: none !important;
+}
+
 /* --- 行内のマス操作コントローラー（追加・削除） --- */
 .tenji-row-controls {
   flex: 0 0 auto;
@@ -203,7 +220,449 @@
   padding: var(--dads-space-4) 0;
 }
 
-/* --- 印刷用スタイル (Print) --- */
+/* =============================================================================
+   文字一覧・五十音表モード (ModeChart) のスタイル
+   ============================================================================= */
+
+/* ツールバー */
+.tenji-chart-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dads-space-3);
+  margin-bottom: var(--dads-space-3);
+  padding: var(--dads-space-3) var(--dads-space-4);
+  background-color: #ffffff;
+  border: 1px solid var(--dads-color-border-subtle);
+  border-radius: var(--dads-radius-md);
+  box-shadow: var(--dads-shadow-sm);
+}
+
+.tenji-chart-toolbar__search {
+  flex: 1 1 240px;
+}
+
+.tenji-chart-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--dads-space-4);
+}
+
+.tenji-toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dads-space-2);
+  font-size: var(--dads-font-size-sm);
+  color: var(--dads-color-text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.tenji-toggle-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--dads-color-blue-600);
+}
+
+/* カテゴリフィルターチップ */
+.tenji-filter-chips {
+  display: flex;
+  align-items: center;
+  gap: var(--dads-space-2);
+  overflow-x: auto;
+  padding: var(--dads-space-1) 0 var(--dads-space-3);
+  -webkit-overflow-scrolling: touch;
+}
+
+.tenji-chip {
+  flex: 0 0 auto;
+  padding: 6px 14px;
+  font-size: var(--dads-font-size-sm);
+  font-weight: 500;
+  border-radius: 9999px;
+  border: 1px solid var(--dads-color-border-normal);
+  background-color: #ffffff;
+  color: var(--dads-color-text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tenji-chip:hover {
+  border-color: var(--dads-color-blue-600);
+  background-color: var(--dads-color-blue-50);
+  color: var(--dads-color-blue-600);
+}
+
+.tenji-chip.is-active {
+  background-color: var(--dads-color-blue-600);
+  border-color: var(--dads-color-blue-600);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(0, 43, 102, 0.2);
+}
+
+/* セクションレイアウト */
+.tenji-chart-sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dads-space-6);
+  margin-top: var(--dads-space-2);
+}
+
+.tenji-section {
+  background-color: #ffffff;
+  border: 1px solid var(--dads-color-border-subtle);
+  border-radius: var(--dads-radius-md);
+  padding: var(--dads-space-4);
+  box-shadow: var(--dads-shadow-sm);
+}
+
+.tenji-section__header {
+  margin-bottom: var(--dads-space-3);
+  padding-bottom: var(--dads-space-2);
+  border-bottom: 2px solid var(--dads-color-blue-100);
+}
+
+.tenji-section__title {
+  margin: 0 0 var(--dads-space-1);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--dads-color-blue-900);
+  display: flex;
+  align-items: center;
+  gap: var(--dads-space-2);
+}
+
+.tenji-section__desc {
+  margin: 0;
+  font-size: var(--dads-font-size-sm);
+  color: var(--dads-color-text-secondary);
+}
+
+/* 五十音（清音）マトリクステーブル */
+.tenji-matrix-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: var(--dads-space-2);
+}
+
+.tenji-matrix-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 6px;
+  min-width: 580px;
+}
+
+.tenji-matrix-table th,
+.tenji-matrix-table td {
+  padding: 6px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* 列ヘッダー（あ段〜お段） */
+.tenji-matrix-th-col {
+  background-color: var(--dads-color-bg-secondary);
+  border-radius: var(--dads-radius-sm);
+  font-size: var(--dads-font-size-sm);
+  font-weight: 700;
+  color: var(--dads-color-text-primary);
+  padding: 8px 4px !important;
+}
+
+.tenji-vowel-note {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: normal;
+  color: var(--dads-color-text-secondary);
+  margin-top: 2px;
+}
+
+/* 行ヘッダー（あ行〜わ行） */
+.tenji-matrix-th-row {
+  background-color: var(--dads-color-bg-secondary);
+  border-radius: var(--dads-radius-sm);
+  font-size: var(--dads-font-size-sm);
+  font-weight: 700;
+  color: var(--dads-color-text-primary);
+  width: 90px;
+  white-space: nowrap;
+}
+
+.tenji-consonant-note {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: normal;
+  color: var(--dads-color-text-secondary);
+  margin-top: 2px;
+}
+
+/* クリック可能な文字カードボタン */
+.tenji-char-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  transition: transform 0.1s ease;
+}
+
+.tenji-char-btn:hover .tenji-cell,
+.tenji-char-btn:focus-visible .tenji-cell {
+  border-color: var(--dads-color-blue-600);
+  box-shadow: 0 2px 8px rgba(0, 43, 102, 0.15);
+  transform: translateY(-2px);
+}
+
+.tenji-char-btn:focus-visible {
+  outline: 2px solid var(--dads-color-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--dads-radius-sm);
+}
+
+/* 空白セル */
+.tenji-cell-empty {
+  width: 58px;
+  height: 94px;
+  margin: 0 auto;
+  background-color: var(--dads-color-bg-secondary);
+  border-radius: var(--dads-radius-sm);
+  opacity: 0.3;
+}
+
+/* グループ＆グリッドレイアウト（濁音・拗音等） */
+.tenji-group {
+  margin-bottom: var(--dads-space-4);
+}
+
+.tenji-group:last-child {
+  margin-bottom: 0;
+}
+
+.tenji-group__title {
+  font-size: var(--dads-font-size-sm);
+  font-weight: 700;
+  color: var(--dads-color-text-secondary);
+  margin: 0 0 var(--dads-space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--dads-space-2);
+}
+
+.tenji-group__title::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 14px;
+  background-color: var(--dads-color-blue-600);
+  border-radius: 2px;
+}
+
+.tenji-group__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dads-space-3);
+  align-items: flex-start;
+}
+
+/* 2マス組み合わせ文字カード (Combo Card) */
+.tenji-combo-card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid var(--dads-color-border-subtle);
+  border-radius: var(--dads-radius-md);
+  padding: 6px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.tenji-combo-card:hover,
+.tenji-combo-card:focus-visible {
+  border-color: var(--dads-color-blue-600);
+  box-shadow: 0 2px 8px rgba(0, 43, 102, 0.15);
+  transform: translateY(-2px);
+}
+
+.tenji-combo-card:focus-visible {
+  outline: 2px solid var(--dads-color-focus-ring);
+  outline-offset: 2px;
+}
+
+.tenji-combo-card__cells {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tenji-combo-card__plus {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--dads-color-text-secondary);
+}
+
+.tenji-combo-card__footer {
+  margin-top: 4px;
+  text-align: center;
+}
+
+.tenji-combo-card__char {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--dads-color-text-primary);
+}
+
+.tenji-combo-card__dots {
+  font-size: 0.68rem;
+  color: var(--dads-color-text-secondary);
+  font-family: monospace, sans-serif;
+  margin-top: 1px;
+}
+
+/* 検索結果領域 */
+.tenji-search-results {
+  background-color: #ffffff;
+  border: 1px solid var(--dads-color-border-subtle);
+  border-radius: var(--dads-radius-md);
+  padding: var(--dads-space-4);
+  box-shadow: var(--dads-shadow-sm);
+}
+
+.tenji-search-count {
+  font-size: var(--dads-font-size-sm);
+  color: var(--dads-color-text-secondary);
+  margin-bottom: var(--dads-space-3);
+  font-weight: 700;
+}
+
+.tenji-search-empty {
+  text-align: center;
+  padding: var(--dads-space-6) 0;
+  color: var(--dads-color-text-secondary);
+}
+
+/* =============================================================================
+   文字詳細ダイアログ (Dialog / Modal)
+   ============================================================================= */
+
+.tenji-dialog {
+  border: none;
+  border-radius: var(--dads-radius-lg);
+  padding: 0;
+  background-color: transparent;
+  max-width: 480px;
+  width: calc(100% - 32px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.tenji-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.tenji-dialog__content {
+  background-color: #ffffff;
+  border-radius: var(--dads-radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tenji-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dads-space-3) var(--dads-space-4);
+  background-color: var(--dads-color-blue-50);
+  border-bottom: 1px solid var(--dads-color-border-subtle);
+}
+
+.tenji-dialog__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--dads-color-blue-900);
+}
+
+.tenji-dialog__close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--dads-color-text-secondary);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--dads-radius-sm);
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.tenji-dialog__close:hover {
+  background-color: var(--dads-color-danger-bg);
+  color: var(--dads-color-danger);
+}
+
+.tenji-dialog__body {
+  padding: var(--dads-space-5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dads-space-4);
+}
+
+.tenji-dialog__char-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dads-space-3);
+  padding: var(--dads-space-3);
+  background-color: var(--dads-color-bg-secondary);
+  border-radius: var(--dads-radius-md);
+  width: 100%;
+}
+
+.tenji-dialog__info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dads-space-2);
+}
+
+.tenji-dialog__info-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: var(--dads-font-size-sm);
+  padding-bottom: var(--dads-space-1);
+  border-bottom: 1px dashed var(--dads-color-border-subtle);
+}
+
+.tenji-dialog__label {
+  color: var(--dads-color-text-secondary);
+  font-weight: 500;
+}
+
+.tenji-dialog__char-name {
+  font-size: 1.25rem;
+  color: var(--dads-color-blue-700);
+}
+
+.tenji-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--dads-space-2);
+  padding: var(--dads-space-3) var(--dads-space-4);
+  background-color: var(--dads-color-bg-secondary);
+  border-top: 1px solid var(--dads-color-border-subtle);
+}
+
+/* =============================================================================
+   印刷用スタイル (Print)
+   ============================================================================= */
 @media print {
   .no-print,
   .dads-header,
@@ -212,6 +671,9 @@
   .dads-form-group,
   .tenji-row-controls,
   .tenji-row__header,
+  .tenji-chart-toolbar,
+  .tenji-filter-chips,
+  .tenji-dialog,
   .dads-button {
     display: none !important;
   }
@@ -244,6 +706,24 @@
     page-break-inside: avoid;
   }
 
+  .tenji-section {
+    border: 1px solid #666;
+    box-shadow: none;
+    page-break-inside: avoid;
+    margin-bottom: 16px;
+    padding: 10px;
+  }
+
+  .tenji-matrix-table {
+    border-collapse: collapse;
+  }
+
+  .tenji-matrix-table th,
+  .tenji-matrix-table td {
+    border: 1px solid #ccc;
+    padding: 4px;
+  }
+
   .tenji-dot[aria-pressed="true"] {
     background-color: #000000 !important;
     border-color: #000000 !important;
@@ -251,5 +731,9 @@
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-}
 
+  .tenji-dot-numbers {
+    color: #222;
+    background-color: #eee;
+  }
+}
